@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { setTheUsername } from "whatwg-url";
 
 const userSchema = new mongoose.Schema(
     {
