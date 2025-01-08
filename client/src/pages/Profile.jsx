@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useRef } from 'react'
 import {getDownloadURL, getStorage , ref, uploadBytes, uploadBytesResumable} from 'firebase/storage'
 import app from '../firebase.js'
-import { updateUserStart, updateUserSuccess, updateUserFaliure, deleteUserStart, deleteUserSuccess, deleteUserFailure } from '../user/userSlice.js'
+import { updateUserStart, updateUserSuccess, updateUserFaliure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signoutUserStart, signoutUserSuccess, signoutUserFailure } from '../user/userSlice.js'
 import { useDispatch } from 'react-redux'
 
 export default function Profile() {
@@ -13,12 +13,9 @@ export default function Profile() {
   const [filePerc , setFilePerc] = useState(undefined)
   const [fileuploadError, setFileUploadError] = useState(false)
   const [formData, setFormData] = useState({})
-  console.log(file)
-  console.log(filePerc)
-  console.log(formData)
+
   const dispatch = useDispatch()
 
-  console.log(`api/user/update/${currentUser._id}`)
   useEffect(()=> {
     if(file) {
       handleFileUpload(file)
@@ -101,6 +98,23 @@ export default function Profile() {
     }
   }
 
+  const handleSignout = async (event) => {
+    try {
+      dispatch(signoutUserStart())
+      const res = await fetch("/api/auth/signout", 
+        {method: 'POST'}
+      )
+      const data = await res.json()
+      if (data.success === false){
+        dispatch(signoutUserFailure(data.message))
+        return
+      }
+      dispatch(signoutUserSuccess(data))
+    } catch (error) {
+      dispatch(signoutUserFailure(error.message))
+    }
+  }
+
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl font-semibold my-7 text-center'>Profile</h1>
@@ -127,7 +141,7 @@ export default function Profile() {
       </form>
       <div className=' flex text-red-500 justify-between mt-4 cursor-pointer'>
         <span onClick={handleDelete}>Delete Account</span>
-        <span>Sign Out</span>
+        <span onClick={handleSignout}>Sign Out</span>
       </div>
 
       <p className='text-red-500 mt-5'>{error ? error.message : ''}</p>
