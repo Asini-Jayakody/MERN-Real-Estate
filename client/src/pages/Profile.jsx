@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useRef } from 'react'
 import {getDownloadURL, getStorage , ref, uploadBytes, uploadBytesResumable} from 'firebase/storage'
 import app from '../firebase.js'
-import { updateUserStart, updateUserSuccess, updateUserFaliure } from '../user/userSlice.js'
+import { updateUserStart, updateUserSuccess, updateUserFaliure, deleteUserStart, deleteUserSuccess, deleteUserFailure } from '../user/userSlice.js'
 import { useDispatch } from 'react-redux'
 
 export default function Profile() {
@@ -69,7 +69,6 @@ export default function Profile() {
           body: JSON.stringify(formData)
         }
       )
-      console.log(res)
       const data = await res.json()
       if (data.success === false){
         dispatch(updateUserFaliure(data))
@@ -78,7 +77,27 @@ export default function Profile() {
       dispatch(updateUserSuccess(data))
       
     } catch (error) {
+      dispatch(updateUserFaliure(error.message))
+    }
+  }
+
+  const handleDelete = async (event) => {
+    event.preventDefault()
+    try {
+      dispatch(deleteUserStart())
+      const res = await fetch(`api/user/delete/${currentUser._id}`,
+        {method: 'DELETE'}
+      )
+
+      const data = res.json()
+      if (data.success===false){
+        dispatch(deleteUserFailure(data))
+        return
+      }
+      dispatch(deleteUserSuccess(data))
       
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message))
     }
   }
 
@@ -107,7 +126,7 @@ export default function Profile() {
         <button disabled={loading} className='uppercase bg-slate-800 text-white p-3 rounded-lg hover:opacity-95 disabled:opacity-80'>{loading? 'Updating...' : 'Update'}</button>
       </form>
       <div className=' flex text-red-500 justify-between mt-4 cursor-pointer'>
-        <span>Delete Account</span>
+        <span onClick={handleDelete}>Delete Account</span>
         <span>Sign Out</span>
       </div>
 
