@@ -5,6 +5,7 @@ import {getDownloadURL, getStorage , ref, uploadBytes, uploadBytesResumable} fro
 import app from '../firebase.js'
 import { updateUserStart, updateUserSuccess, updateUserFaliure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signoutUserStart, signoutUserSuccess, signoutUserFailure } from '../user/userSlice.js'
 import { useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 export default function Profile() {
   const fileRef = useRef(null)
@@ -142,6 +143,11 @@ export default function Profile() {
       <div className=' flex text-red-500 justify-between mt-4 cursor-pointer'>
         <span onClick={handleDelete}>Delete Account</span>
         <span onClick={handleSignout}>Sign Out</span>
+      </div>
+      <div className=' text-green-600 text-center'>
+        <Link to='/create-listing'>
+          <span >Create Listing</span>
+        </Link>
       </div>
 
       <p className='text-red-500 mt-5'>{error ? error.message : ''}</p>
