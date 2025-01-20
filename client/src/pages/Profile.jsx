@@ -140,15 +140,19 @@ export default function Profile() {
         <input type="password" placeholder='password' id='password' className='p-3 border rounded-lg' onChange={handleOnchange}/>
         <button disabled={loading} className='uppercase bg-slate-800 text-white p-3 rounded-lg hover:opacity-95 disabled:opacity-80'>{loading? 'Updating...' : 'Update'}</button>
       </form>
-      <div className=' flex text-red-500 justify-between mt-4 cursor-pointer'>
-        <span onClick={handleDelete}>Delete Account</span>
-        <span onClick={handleSignout}>Sign Out</span>
-      </div>
-      <div className=' text-green-600 text-center'>
+      <div className='text-center bg-green-600 rounded-lg p-3 text-white uppercase w-full mt-4 hover:opacity-95 disabled::opacity-80'>
         <Link to='/create-listing'>
           <span >Create Listing</span>
         </Link>
       </div>
+      <div className=' flex text-red-500 justify-between mt-4 cursor-pointer'>
+        <span onClick={handleDelete}>Delete Account</span>
+        <span onClick={handleSignout}>Sign Out</span>
+      </div>
+      <div className=' text-green-600 text-center mt-4 cursor-pointer'>
+        <span >Show Listing</span>
+      </div>
+      
 
       <p className='text-red-500 mt-5'>{error ? error.message : ''}</p>
       <p className='text-green-600 mt-5'>{(updateUserSuccess && error==null)? 'User updated successfully! ' : ''}</p>
