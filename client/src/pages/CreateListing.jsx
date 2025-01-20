@@ -2,6 +2,7 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import React , {useState} from 'react'
 import app from '../firebase'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 export default function CreateListing() {
   const [files,setFiles] = useState([])
@@ -25,6 +26,8 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState(null)
+
+  const navigate = useNavigate()
 
   console.log(formData)
   const handleImagesSubmit = (event) => {
@@ -71,7 +74,7 @@ export default function CreateListing() {
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => 
-            resolve({...formData, imageUrls:downloadURL}))
+            resolve(downloadURL))
         })
       })
   }
@@ -141,7 +144,7 @@ export default function CreateListing() {
         return
       }
       setCreating(false)
-      
+      navigate(`listing/${data._id}`)
     } catch (error) {
       setCreating(false)
       setError(error.message)
@@ -225,7 +228,7 @@ export default function CreateListing() {
               <p className='text-red-600'>{imageUploadError && imageUploadError}</p>
               {
                 formData.imageUrls.length > 0 && formData.imageUrls.map((url,index) => (
-                  <div key={url} className='flex flex-col justify-between'>
+                  <div key={url} className='flex flex-row items-center justify-between'>
                     <img src={url} alt="listing image" className='w-20 h-20 object-contain rounded-lg'/>
                     <button onClick={() => handleRemoveImage(index)} type='button' className='text-red-600 uppercase'>Delete</button>
                   </div>
