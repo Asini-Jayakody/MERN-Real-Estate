@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useRef } from 'react'
-import {getDownloadURL, getStorage , ref, uploadBytes, uploadBytesResumable} from 'firebase/storage'
+import {getDownloadURL, getStorage , list, ref, uploadBytes, uploadBytesResumable} from 'firebase/storage'
 import app from '../firebase.js'
 import { updateUserStart, updateUserSuccess, updateUserFaliure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signoutUserStart, signoutUserSuccess, signoutUserFailure } from '../user/userSlice.js'
 import { useDispatch } from 'react-redux'
@@ -14,9 +14,11 @@ export default function Profile() {
   const [filePerc , setFilePerc] = useState(undefined)
   const [fileuploadError, setFileUploadError] = useState(false)
   const [formData, setFormData] = useState({})
-
+  const [showListingError, setShowListingError] = useState(false)
+  const [userListing, setUserListing] = useState([])
   const dispatch = useDispatch()
 
+  // console.log(userListing)
   useEffect(()=> {
     if(file) {
       handleFileUpload(file)
@@ -116,6 +118,24 @@ export default function Profile() {
     }
   }
 
+  const handleShowListing = async (event) => {
+    event.preventDefault()
+    try {
+      setShowListingError(false)
+      const res = await fetch(`api/user/listing/${currentUser._id}`)
+      const data = await res.json()
+      if (data.success == false) {
+        setShowListingError(true)
+        return
+      }
+      // console.log('data ',data)
+      setUserListing(data)
+      
+    } catch (error) {
+      setShowListingError(true)
+    }
+  }
+
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl font-semibold my-7 text-center'>Profile</h1>
@@ -150,10 +170,36 @@ export default function Profile() {
         <span onClick={handleSignout}>Sign Out</span>
       </div>
       <div className=' text-green-600 text-center mt-4 cursor-pointer'>
-        <span >Show Listing</span>
+        <button onClick={handleShowListing} >Show Listing</button>
       </div>
-      
 
+      {userListing && userListing.length > 0 && (
+        <div className='flex flex-col gap-4'>
+          <h1 className='text-center mt-7 text-2xl font-semibold'>
+            Your Listings
+          </h1>
+          {userListing.map((listing) => (
+            <div className='flex flex-row border rounded-lg gap-4 items-center'>
+              <Link to={`/listing/${listing._id}`}>
+                <img src={listing.imageUrls[0]} alt="listing cover" className='h-16 w-16 object-contain' />
+              </Link>
+              <Link to={`/listing/${listing._id}`} className='text-slate-700 font-semibold hover:underline truncate flex-1'>
+                <p>{listing.name}</p>
+              </Link>
+              <div className='flex flex-col item-center'>
+                <button className='text-red-700 uppercase'>
+                  Delete
+                </button>
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button className='text-green-700 uppercase'>Edit</button>
+                </Link>
+              </div>
+            </div>           
+          ))}
+        </div>
+      )}
+      
+      <p className='text-green-600 mt-5'>{showListingError? 'Error in Show listing! ' : ''}</p>
       <p className='text-red-500 mt-5'>{error ? error.message : ''}</p>
       <p className='text-green-600 mt-5'>{(updateUserSuccess && error==null)? 'User updated successfully! ' : ''}</p>
     </div>
