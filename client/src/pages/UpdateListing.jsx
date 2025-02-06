@@ -159,7 +159,7 @@ export default function UpdateListing() {
         return
       }
       setCreating(false)
-      navigate(`listing/${data._id}`)
+      navigate(`/listing/${data._id}`)
     } catch (error) {
       setCreating(false)
       setError(error.message)
